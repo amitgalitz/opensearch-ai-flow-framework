@@ -20,7 +20,6 @@ import org.opensearch.flowframework.util.ParseUtils;
 import org.opensearch.flowframework.workflow.ProcessNode;
 import org.opensearch.flowframework.workflow.WorkflowData;
 import org.opensearch.flowframework.workflow.WorkflowStep;
-import org.opensearch.ml.common.model.Guardrails;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -33,7 +32,6 @@ import java.util.Objects;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.opensearch.core.xcontent.XContentParserUtils.ensureExpectedToken;
 import static org.opensearch.flowframework.common.CommonValue.CONFIGURATIONS;
-import static org.opensearch.flowframework.common.CommonValue.GUARDRAILS_FIELD;
 import static org.opensearch.flowframework.common.CommonValue.TOOLS_ORDER_FIELD;
 import static org.opensearch.flowframework.util.ParseUtils.buildStringToObjectMap;
 import static org.opensearch.flowframework.util.ParseUtils.buildStringToStringMap;
@@ -97,9 +95,6 @@ public class WorkflowNode implements ToXContentObject {
             xContentBuilder.field(e.getKey());
             if (e.getValue() instanceof String || e.getValue() instanceof Number || e.getValue() instanceof Boolean) {
                 xContentBuilder.value(e.getValue());
-            } else if (GUARDRAILS_FIELD.equals(e.getKey())) {
-                Guardrails g = (Guardrails) e.getValue();
-                xContentBuilder.value(g);
             } else if (e.getValue() instanceof Map<?, ?>) {
                 buildStringToStringMap(xContentBuilder, (Map<?, ?>) e.getValue());
             } else if (e.getValue() instanceof Object[]) {
@@ -161,16 +156,13 @@ public class WorkflowNode implements ToXContentObject {
                                 userInputs.put(inputFieldName, parser.text());
                                 break;
                             case START_OBJECT:
-                                if (GUARDRAILS_FIELD.equals(inputFieldName)) {
-                                    userInputs.put(inputFieldName, Guardrails.parse(parser));
-                                    break;
-                                } else if (CONFIGURATIONS.equals(inputFieldName)) {
+                                if (CONFIGURATIONS.equals(inputFieldName)) {
                                     Map<String, Object> configurationsMap = parser.map();
                                     try {
                                         String configurationsString = ParseUtils.parseArbitraryStringToObjectMapToString(configurationsMap);
                                         userInputs.put(inputFieldName, configurationsString);
                                     } catch (Exception ex) {
-                                        String errorMessage = "Failed to parse" + inputFieldName + "map";
+                                        String errorMessage = "Failed to parse configuration map";
                                         logger.error(errorMessage, ex);
                                         throw new FlowFrameworkException(errorMessage, RestStatus.BAD_REQUEST);
                                     }
