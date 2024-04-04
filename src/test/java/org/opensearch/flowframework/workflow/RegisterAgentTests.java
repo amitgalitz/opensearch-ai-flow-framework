@@ -16,7 +16,6 @@ import org.opensearch.core.rest.RestStatus;
 import org.opensearch.flowframework.exception.FlowFrameworkException;
 import org.opensearch.flowframework.indices.FlowFrameworkIndicesHandler;
 import org.opensearch.ml.client.MachineLearningNodeClient;
-import org.opensearch.ml.common.MLAgentType;
 import org.opensearch.ml.common.agent.LLMSpec;
 import org.opensearch.ml.common.agent.MLAgent;
 import org.opensearch.ml.common.agent.MLMemorySpec;
@@ -70,7 +69,7 @@ public class RegisterAgentTests extends OpenSearchTestCase {
             Map.ofEntries(
                 Map.entry("name", "test"),
                 Map.entry("description", "description"),
-                Map.entry("type", MLAgentType.FLOW.name()),
+                Map.entry("type", "type"),
                 Map.entry("llm.model_id", "xyz"),
                 Map.entry("llm.parameters", Collections.emptyMap()),
                 Map.entry("tools", tools),
